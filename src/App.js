@@ -18,25 +18,25 @@ function App() {
   }, []);
 
   async function handleAddRepository() {
-    await api.post("repositories", {
+    const { data } = await api.post("repositories", {
       title: `Projeto novo ${Date.now()}`,
       url: "http://github.com/...",
       techs: [],
     });
 
-    loadRepositories();
+    setRepositories([...repositories, data]);
   }
 
   async function handleRemoveRepository(id) {
     await api.delete(`repositories/${id}`);
 
-    loadRepositories();
+    setRepositories(repositories.filter((repo) => repo.id !== id));
   }
 
   async function handleLikeRepository(id) {
     await api.post(`repositories/${id}/like`);
 
-    loadRepositories();
+    await loadRepositories();
   }
 
   return (
@@ -44,16 +44,17 @@ function App() {
       <ul data-testid="repository-list">
         {repositories.map((repository) => (
           <li key={repository.id}>
-            {repository.title} ({repository.likes} likes)
+            {repository.title}
+            <span>({repository.likes} likes)</span>
             <button
               onClick={() => handleLikeRepository(repository.id)}
-              class="like"
+              className="like"
             >
               Like
             </button>
             <button
               onClick={() => handleRemoveRepository(repository.id)}
-              class="remover"
+              className="remover"
             >
               Remover
             </button>
